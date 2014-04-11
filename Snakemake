@@ -1,0 +1,29 @@
+# python syntax
+import os
+from os import path
+from glob import glob
+
+
+TOPHAT_VER = "tophat/2.0.9/bowtie2-2.2.0" # we freeze the version of tophat to this one.  If necessary we can change this to run the whole analysis again.
+
+dirname_part_prog = TOPHAT_VER.replace( "/", "" ) # the output directory name will have the tophat version baked in for further reference.
+
+sequence_files = glob( "sequence_files/*.fastq.gz" )
+dirnames_base = [ a.split("/")[1].split("_")[0] for a in sequence_files ]
+
+op_dirnames = ["alignment_files/"+a+"_"+dirname_part_prog for a in dirnames_base]
+print( op_dirnames )
+
+
+## rule indexbam:
+##     """Index a bam file using bamtools, creating .bam.bai"""
+##     input: "{base}.bam"
+##     output: "{base}.bam.bai"
+##     params: batch = "-l nodes=1:gpfs"
+##     threads = 1
+##     shell: "module load bamtools; bamtools index -in {input}
+## 
+## 
+## rule rnaalignment:
+##     """Align the fastq files"""
+##     input: 
