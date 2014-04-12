@@ -12,15 +12,26 @@ sequence_files = glob( "sequence_files/*.fastq.gz" )
 dirnames_base = [ a.split("/")[1].split("_")[0] for a in sequence_files ]
 
 op_dirnames = ["alignment_files/"+a+"_"+dirname_part_prog for a in dirnames_base]
-print( op_dirnames ) # for debuggin
 
 opnames_pos = [ fname+"_pos.bam" for fname in op_dirnames ]
 opnames_neg = [ fname+"_neg.bam" for fname in op_dirnames ]
 
+###############################################
+"""Debugging comments, we will remove them once we are done with them"""
+print( op_dirnames ) # for debugging
 print( opnames_pos ) # for debugging
 print( opnames_neg ) # for debugging
 
 
+
+### My rules
+rule bai_files:
+    params: batch = "-l nodes=1:gpfs"
+    input: [ fname+".bai" for fname in opnames_pos + opnames_neg ]
+
+
+
+### Rules copied from Sean's files
 ## rule indexbam:
 ##     """Index a bam file using bamtools, creating .bam.bai"""
 ##     input: "{base}.bam"
