@@ -13,10 +13,10 @@ dirnames_base = [ a.split("/")[1].split("_")[0] for a in sequence_files ]
 
 op_dirnames = ["alignment_files/"+a+"_"+dirname_part_prog for a in dirnames_base]
 
-opnames_pos = [ fname+"_pos.bam" for fname in op_dirnames ]
-opnames_neg = [ fname+"_neg.bam" for fname in op_dirnames ]
+opnames_pos = [ fname+"_pos.bam" for fname in op_dirnames ] # all the positive strand bam files
+opnames_neg = [ fname+"_neg.bam" for fname in op_dirnames ] # all the negative strand bam files
 
-BAIFNAMES = [ fname+".bai" for fname in opnames_pos + opnames_neg ]
+BAMFNAMES = [ fname for fname in opnames_pos + opnames_neg ]
 
 ###############################################
 """Debugging comments, we will remove them once we are done with them"""
@@ -26,12 +26,11 @@ print( opnames_neg ) # for debugging
 print( BAIFNAMES )   # for debuggin
 
 
-
 ### My rules
 rule bai_files:
     params: batch = "-l nodes=1:gpfs"
     input: [ fname+".bai" for fname in opnames_pos + opnames_neg ]
-    shell: "module load bamtools; bamtools index -in {baifnames}"
+    shell: "module load bamtools; bamtools index -in {bamfnames}"
 
 
 
