@@ -23,7 +23,7 @@ BAMFNAMES = [ fname for fname in opnames_pos + opnames_neg ]
 print( op_dirnames ) # for debugging
 print( opnames_pos ) # for debugging
 print( opnames_neg ) # for debugging
-print( BAIFNAMES )   # for debuggin
+print( BAMFNAMES )   # for debuggin
 
 
 ### My rules
