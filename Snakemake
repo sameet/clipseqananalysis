@@ -16,11 +16,14 @@ op_dirnames = ["alignment_files/"+a+"_"+dirname_part_prog for a in dirnames_base
 opnames_pos = [ fname+"_pos.bam" for fname in op_dirnames ]
 opnames_neg = [ fname+"_neg.bam" for fname in op_dirnames ]
 
+BAIFNAMES = [ fname+".bai" for fname in opnames_pos + opnames_neg ]
+
 ###############################################
 """Debugging comments, we will remove them once we are done with them"""
 print( op_dirnames ) # for debugging
 print( opnames_pos ) # for debugging
 print( opnames_neg ) # for debugging
+print( BAIFNAMES )   # for debuggin
 
 
 
@@ -28,6 +31,7 @@ print( opnames_neg ) # for debugging
 rule bai_files:
     params: batch = "-l nodes=1:gpfs"
     input: [ fname+".bai" for fname in opnames_pos + opnames_neg ]
+    shell: "module load bamtools; bamtools index -in {baifnames}"
 
 
 
