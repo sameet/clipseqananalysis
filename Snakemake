@@ -12,7 +12,13 @@ sequence_files = glob( "sequence_files/*.fastq.gz" )
 dirnames_base = [ a.split("/")[1].split("_")[0] for a in sequence_files ]
 
 op_dirnames = ["alignment_files/"+a+"_"+dirname_part_prog for a in dirnames_base]
-print( op_dirnames )
+print( op_dirnames ) # for debuggin
+
+opnames_pos = [ fname+"_pos.bam" for fname in op_dirnames ]
+opnames_neg = [ fname+"_neg.bam" for fname in op_dirnames ]
+
+print( opnames_pos ) # for debugging
+print( opnames_neg ) # for debugging
 
 
 ## rule indexbam:
