@@ -35,7 +35,7 @@ rule final:
 
 rule bai_files:
     params: batch = "-l nodes=1:gpfs"
-    input: expand('alignment_files/{bamfiles}', bamfiles=BAMFNAMES )
+    input: expand('alignment_files/{bamfnames}', bamfnames=BAMFNAMES )
     shell: expand( "module load samtools; samtools index -i {bamfnames}", bamfnames=BAMFNAMES )
 
 rule bam_files:
