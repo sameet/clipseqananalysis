@@ -18,7 +18,7 @@ opnames_pos = [ fname+"_pos.bam" for fname in op_dirnames ] # all the positive s
 opnames_neg = [ fname+"_neg.bam" for fname in op_dirnames ] # all the negative strand bam files
 BAMFNAMES = opnames_pos + opnames_neg
 
-BAIFNAMES = [ fname+".bai" for fname in opnames_all ]
+BAIFNAMES = [ fname+".bai" for fname in BAMFNAMES ]
 
 ###############################################
 """Debugging comments, we will remove them once we are done with them"""
