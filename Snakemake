@@ -31,7 +31,7 @@ print( BAMFNAMES )   # for debuggin
 ### My rules
 rule final:
     params: batch = "-l nodes=1:gpfs"
-    input: [fname+'.bai' for fname in BAMFILES]
+    input: [fname+'.bai' for fname in BAMFNAMES]
 
 rule bai_files:
     params: batch = "-l nodes=1:gpfs"
