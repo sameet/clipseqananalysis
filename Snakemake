@@ -37,7 +37,7 @@ rule bai_files:
 rule bam_files:
     params: batch = "-l nodes=1:gpfs"
     input: sequence_files, TOPHAT_VER
-    shell: """
+    shell: expand( """
         module load {tophat}; 
 	tophat \
 	-p 32 \
@@ -49,7 +49,7 @@ rule bam_files:
 	-o {op_dirnames} \
 	{genome_ver} \
 	{sequence_files}
-	"""
+	""", tophat=TOPHAT_VER, genome_ver=GENOME_VER, op_dirnames=op_dirnames, sequence_files=sequence_files)
 
 
 
