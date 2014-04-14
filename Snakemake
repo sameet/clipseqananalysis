@@ -31,7 +31,7 @@ print( BAMFNAMES )   # for debuggin
 ### My rules
 rule bai_files:
     params: batch = "-l nodes=1:gpfs"
-    input: BAIFNAMES
+    input: expand('{bamfiles}', bamfiles=BAMFNAMES )
     shell: "module load bamtools; bamtools index -in {bamfnames}"
 
 rule bam_files:
