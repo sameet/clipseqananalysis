@@ -4,6 +4,7 @@ from os import path
 from glob import glob
 
 
+GENOME_VER = "/home/mehtass/data/genome_data/ensemble_2013/Schizosaccharomyces_pombe_ensemble"
 TOPHAT_VER = "tophat/2.0.9/bowtie2-2.2.0" # we freeze the version of tophat to this one.  If necessary we can change this to run the whole analysis again.
 
 dirname_part_prog = TOPHAT_VER.replace( "/", "" ) # the output directory name will have the tophat version baked in for further reference.
@@ -20,6 +21,7 @@ BAMFNAMES = [ fname for fname in opnames_pos + opnames_neg ]
 
 ###############################################
 """Debugging comments, we will remove them once we are done with them"""
+print( sequence_files ) # for debugging
 print( op_dirnames ) # for debugging
 print( opnames_pos ) # for debugging
 print( opnames_neg ) # for debugging
@@ -31,6 +33,27 @@ rule bai_files:
     params: batch = "-l nodes=1:gpfs"
     input: [ fname+".bai" for fname in opnames_pos + opnames_neg ]
     shell: "module load bamtools; bamtools index -in {bamfnames}"
+
+rule bam_files:
+    params: batch = "-l nodes=1:gpfs"
+    input: sequence_files, TOPHAT_VER
+    shell: """
+        module load {tophat}; 
+	tophat \
+	-p 32 \
+	--library-type fr-secondstrand \
+	-r 250 \
+	-i 40 \
+	-I 900 \
+	--microexon-search \
+	-o {op_dirnames} \
+	{genome_ver} \
+	{sequence_files}
+	"""
+
+
+
+
 
 
 
