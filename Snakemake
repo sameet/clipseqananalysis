@@ -22,8 +22,8 @@ BAIFNAMES = [ fname+".bai" for fname in BAMFNAMES ]
 
 ###############################################
 """Debugging comments, we will remove them once we are done with them"""
-print( sequence_files ) # for debugging
-print( op_dirnames ) # for debugging
+# print( sequence_files ) # for debugging
+# print( op_dirnames ) # for debugging
 print( BAMFNAMES )   # for debuggin
 
 
