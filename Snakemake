@@ -24,8 +24,8 @@ BAIFNAMES = [ fname+".bai" for fname in opnames_all ]
 """Debugging comments, we will remove them once we are done with them"""
 print( sequence_files ) # for debugging
 print( op_dirnames ) # for debugging
-print( opnames_all ) # for debugging
 print( BAMFNAMES )   # for debuggin
+
 
 
 ### My rules
