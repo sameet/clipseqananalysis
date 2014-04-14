@@ -24,9 +24,8 @@ BAIFNAMES = [ fname+".bai" for fname in BAMFNAMES ]
 """Debugging comments, we will remove them once we are done with them"""
 # print( sequence_files ) # for debugging
 # print( op_dirnames ) # for debugging
-print( BAMFNAMES )   # for debuggin
-
-
+# print( BAMFNAMES )   # for debuggin
+# print( BAIFNAMES )   # for debuggin
 
 ### My rules
 rule final:
@@ -63,10 +62,6 @@ rule pos_neg:
     samtools view -F 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_pos};
     samtools view -f 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_neg};
     """, op_dirnames=op_dirnames, opnames_pos=opnames_pos, opnames_neg=opnames_neg )
-
-
-
-
 
 
 ### Rules copied from Sean's files
