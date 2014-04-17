@@ -14,7 +14,7 @@ dirname_part_prog = TOPHAT.replace( "/", "" ) # the output directory name will h
 sequence_files = glob( "sequence_files/*.fastq.gz" )
 dirnames_base = [ a.split("/")[1].split("_")[0] for a in sequence_files ]
 
-op_dirnames = ["alignment_files/"+a+"_"+dirname_part_prog for a in dirnames_base]
+op_dirnames = ["alignment_files/" + fname.split('/')[1].split('.')[0] for fname in sequence_files]
 
 opnames_pos = [ fname+"_pos.bam" for fname in op_dirnames ] # all the positive strand bam files
 opnames_neg = [ fname+"_neg.bam" for fname in op_dirnames ] # all the negative strand bam files
@@ -25,7 +25,7 @@ BAIFNAMES = [ fname+".bai" for fname in BAMFNAMES ]
 ###############################################
 """Debugging comments, we will remove them once we are done with them"""
 # print( sequence_files ) # for debugging
-# print( op_dirnames ) # for debugging
+print( op_dirnames ) # for debugging
 # print( BAMFNAMES )   # for debuggin
 # print( BAIFNAMES )   # for debuggin
 
