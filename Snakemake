@@ -5,9 +5,11 @@ from glob import glob
 
 
 GENOME_VER = "/home/mehtass/data/genome_data/ensemble_2013/Schizosaccharomyces_pombe_ensemble"
-TOPHAT_VER = "tophat/2.0.9/bowtie2-2.2.0" # we freeze the version of tophat to this one.  If necessary we can change this to run the whole analysis again.
+# TOPHAT_VER = "tophat/2.0.9/bowtie2-2.2.0" # we freeze the version of tophat to this one.  If necessary we can change this to run the whole analysis again.
+TOPHAT = "tophat/2.0.9/bowtie2-2.2.0" # we freeze the version of tophat to this one.  If necessary we can change this to run the whole analysis again.
 
-dirname_part_prog = TOPHAT_VER.replace( "/", "" ) # the output directory name will have the tophat version baked in for further reference.
+# dirname_part_prog = TOPHAT_VER.replace( "/", "" ) # the output directory name will have the tophat version baked in for further reference.
+dirname_part_prog = TOPHAT.replace( "/", "" ) # the output directory name will have the tophat version baked in for further reference.
 
 sequence_files = glob( "sequence_files/*.fastq.gz" )
 dirnames_base = [ a.split("/")[1].split("_")[0] for a in sequence_files ]
@@ -34,15 +36,15 @@ rule final:
 
 rule indexbam:
     params: batch = "-l nodes=1:gpfs"
-    input: expand('alignment_files/{bamfnames}', bamfnames=BAMFNAMES )
+    input: expand( 'alignment_files/{bamfnames}', bamfnames=BAMFNAMES )
     output: 'alignment_files/{bamfname}.bai'
-    shell: expand( "module load samtools; samtools index -i {input}", bamfnames=BAMFNAMES )
+    shell: "module load samtools; samtools index -i {input}"
 
 rule tophatalign:
     params: batch = "-l nodes=1:gpfs"
-    input: sequence_files, TOPHAT_VER
+    input: 'sequence_files/{samplename}.fastq.gz'
     output: 'alignment_files/{samplename}_pos.bam', 'alignment_files/{samplename}_neg.bam'
-    shell: expand( """
+    shell: """
         module load {tophat}; 
 	tophat \
 	-p 32 \
@@ -53,21 +55,21 @@ rule tophatalign:
 	--microexon-search \
 	-o {op_dirnames} \
 	{genome_ver} \
-	{sequence_files}
+	{input};
 	module load samtools;
         samtools view -F 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_pos};
         samtools view -f 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_neg};
-""", tophat=TOPHAT_VER, genome_ver=GENOME_VER, op_dirnames=op_dirnames, sequence_files=sequence_files, opnames_pos=opnames_pos, opnames_neg=opnames_neg)
+"""
 
-rule pos_neg:
-    params: batch = "-l nodes=1:gpfs"
-    input: expand( '{op_dirnames}/accepted_hits.bam', op_dirnames=op_dirnames )
-    shell: expand( """
-    module load samtools;
-    samtools view -F 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_pos};
-    samtools view -f 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_neg};
-    """, op_dirnames=op_dirnames, opnames_pos=opnames_pos, opnames_neg=opnames_neg )
-
+## rule pos_neg:
+##     params: batch = "-l nodes=1:gpfs"
+##     input: expand( '{op_dirnames}/accepted_hits.bam', op_dirnames=op_dirnames )
+##     shell: expand( """
+##     module load samtools;
+##     samtools view -F 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_pos};
+##     samtools view -f 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_neg};
+##     """, op_dirnames=op_dirnames, opnames_pos=opnames_pos, opnames_neg=opnames_neg )
+## 
 
 ### Rules copied from Sean's files
 ## rule indexbam:
