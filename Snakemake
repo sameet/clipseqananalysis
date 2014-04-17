@@ -12,12 +12,14 @@ TOPHAT = "tophat/2.0.9/bowtie2-2.2.0" # we freeze the version of tophat to this 
 dirname_part_prog = TOPHAT.replace( "/", "" ) # the output directory name will have the tophat version baked in for further reference.
 
 sequence_files = glob( "sequence_files/*.fastq.gz" )
+print( sequence_files ) # for debugging
+SAMPLENAMES = [fname.split('/')[1].split('.')[0] for fname in sequence_files ]
+print( SAMPLENAMES ) # for debugging
 dirnames_base = [ a.split("/")[1].split("_")[0] for a in sequence_files ]
 
-op_dirnames = ["alignment_files/" + fname.split('/')[1].split('.')[0] for fname in sequence_files]
-
-opnames_pos = [ fname+"_pos.bam" for fname in op_dirnames ] # all the positive strand bam files
-opnames_neg = [ fname+"_neg.bam" for fname in op_dirnames ] # all the negative strand bam files
+op_dirnames = [ 'alignment_files/' + sample for sample in SAMPLENAMES ] 
+opnames_pos = [ 'alignment_files/' + sample + "_pos.bam" for sample in SAMPLENAMES ] # all the positive strand bam files 
+opnames_neg = [ 'alignment_files/' + sample + "_neg.bam" for sample in SAMPLENAMES ] # all the negative strand bam files
 BAMFNAMES = opnames_pos + opnames_neg
 
 BAIFNAMES = [ fname+".bai" for fname in BAMFNAMES ]
@@ -26,26 +28,26 @@ BAIFNAMES = [ fname+".bai" for fname in BAMFNAMES ]
 """Debugging comments, we will remove them once we are done with them"""
 # print( sequence_files ) # for debugging
 print( op_dirnames ) # for debugging
-# print( BAMFNAMES )   # for debuggin
+print( BAMFNAMES )   # for debuggin
 # print( BAIFNAMES )   # for debuggin
 
 ### My rules
 rule final:
     params: batch = "-l nodes=1:gpfs"
-    input: [fname+'.bai' for fname in BAMFNAMES]
+    input: [fname + '.bai' for fname in BAMFNAMES]
 
 rule indexbam:
     params: batch = "-l nodes=1:gpfs"
-    input: expand( 'alignment_files/{bamfnames}', bamfnames=BAMFNAMES )
-    output: 'alignment_files/{bamfname}.bai'
+    input: BAMFNAMES
+    output: expand( '{bamfnames}.bai', bamfnames=BAMFNAMES )
     shell: "module load samtools; samtools index -i {input}"
 
 rule tophatalign:
     params: batch = "-l nodes=1:gpfs"
-    input: 'sequence_files/{samplename}.fastq.gz'
-    output: 'alignment_files/{samplename}_pos.bam', 'alignment_files/{samplename}_neg.bam'
+    input: expand( 'sequence_files/{samplenames}.fastq.gz', samplenames=SAMPLENAMES )
+    output: BAMFNAMES
     shell: """
-        module load {tophat}; 
+        module load {TOPHAT}; 
 	tophat \
 	-p 32 \
 	--library-type fr-secondstrand \
@@ -54,7 +56,7 @@ rule tophatalign:
 	-I 900 \
 	--microexon-search \
 	-o {op_dirnames} \
-	{genome_ver} \
+	{GENOME_VER} \
 	{input};
 	module load samtools;
         samtools view -F 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_pos};
