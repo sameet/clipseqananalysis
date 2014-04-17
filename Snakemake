@@ -1,6 +1,6 @@
-# python syntax
-import os
-from os import path
+# python syntax 
+import os 
+from os import path 
 from glob import glob
 
 
@@ -38,16 +38,16 @@ rule final:
 
 rule indexbam:
     params: batch = "-l nodes=1:gpfs"
-    input: BAMFNAMES
-    output: expand( '{bamfnames}.bai', bamfnames=BAMFNAMES )
+    input: '{base}.bam'
+    output: '{base}.bam.bai'
     shell: "module load samtools; samtools index -i {input}"
 
 rule tophatalign:
     params: batch = "-l nodes=1:gpfs"
-    input: expand( 'sequence_files/{samplenames}.fastq.gz', samplenames=SAMPLENAMES )
-    output: BAMFNAMES
-    shell: """
-        module load {TOPHAT}; 
+    input: 'sequence_files/{base}.fastq.gz'
+    output: 'alignment_files/{base}.bam'
+    shell: expand( """
+        module load {tophat}; 
 	tophat \
 	-p 32 \
 	--library-type fr-secondstrand \
@@ -56,12 +56,12 @@ rule tophatalign:
 	-I 900 \
 	--microexon-search \
 	-o {op_dirnames} \
-	{GENOME_VER} \
+	{genome_ver} \
 	{input};
 	module load samtools;
         samtools view -F 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_pos};
         samtools view -f 0x10 -b {op_dirnames}/accepted_hits.bam > {opnames_neg};
-"""
+""", op_dirnames=op_dirnames, tophat=TOPHAT, genome_ver=GENOME_VER, input=input, opnames_pos=opnames_pos, opnames_neg=opnames_neg )
 
 ## rule pos_neg:
 ##     params: batch = "-l nodes=1:gpfs"
