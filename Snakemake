@@ -40,28 +40,42 @@ rule indexbam:
     params: batch = "-l nodes=1:gpfs"
     input: 'alignment_files/{base}.bam'
     output: 'alignment_files/{base}.bam.bai'
-    shell: "module load samtools; samtools index -i {input}"
+#    input: 'alignment_files/{base}_pos.bam', 'alignment_files/{base}_neg.bam'
+#    output: 'alignment_files/{base}_pos.bam.bai', 'alignment_files/{base}_neg.bam.bai'
+    run: shell("module load samtools; touch {output}")
+#shell: "module load samtools; samtools index -i {input}"
 
 rule tophatalign:
     params: batch = "-l nodes=1:gpfs"
     input: 'sequence_files/{base}.fastq.gz'
     output: 'alignment_files/{base}_pos.bam', 'alignment_files/{base}_neg.bam'
-    shell: """
-        module load tophat/2.0.9/towtie2-2.2.0; 
-	tophat \
-	-p 32 \
-	--library-type fr-secondstrand \
-	-r 250 \
-	-i 40 \
-	-I 900 \
-	--microexon-search \
-	-o alignment_files/{base} \
-	/home/mehtass/data/genome_data/ensemble_2013/Schizosaccharomyces_pombe_ensemble \
-	{input};
-	module load samtools;
-        samtools view -F 0x10 -b alignment_files/{base}/accepted_hits.bam > alignment_files/{base}_pos.bam;
-        samtools view -f 0x10 -b alignment_files/{base}/accepted_hits.bam > alignment_files/{base}_neg.bam;
-"""
+    run: 
+    	 cmd = "module load tophat/2.0.9/bowtie2-2.2.0;"
+	 cmd = cmd + "tophat -p 32 --library-type fr-secondstrand -r 250 -i 40 -I 900 --microexon-search "
+	 cmd = cmd + "-o alignment_files/{wildcards.base} "
+	 cmd = cmd + "/home/mehtass/data/genome_data/ensemble_2013/Schizosaccharomyces_pombe_ensemble "
+	 cmd = cmd + "{input} ;"
+	 cmd = cmd + "module load samtools; "
+	 cmd = cmd + "samtools view -F 0x10 -b alignment_files/{wildcards.base}/accepted_hits.bam > alignment_files/{wildcards.base}_pos.bam; "
+	 cmd = cmd + "samtools view -f 0x10 -b alignment_files/{wildcards.base}/accepted_hits.bam > alignment_files/{wildcards.base}_neg.bam; "
+	 shell(cmd)
+#    run: shell("touch {output}")
+#    shell: expand( """
+#        module load tophat/2.0.9/towtie2-2.2.0; 
+#	tophat \
+#	-p 32 \
+#	--library-type fr-secondstrand \
+#	-r 250 \
+#	-i 40 \
+#	-I 900 \
+#	--microexon-search \
+#	-o alignment_files/{base} \
+#	/home/mehtass/data/genome_data/ensemble_2013/Schizosaccharomyces_pombe_ensemble \
+#	{input};
+#	module load samtools;
+#        samtools view -F 0x10 -b alignment_files/{base}/accepted_hits.bam > alignment_files/{base}_pos.bam;
+#        samtools view -f 0x10 -b alignment_files/{base}/accepted_hits.bam > alignment_files/{base}_neg.bam;
+#""", base=SAMPLENAMES, input='sequence_files/{base}.fastq.gz' )
 
 ## rule pos_neg:
 ##     params: batch = "-l nodes=1:gpfs"
